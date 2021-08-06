@@ -3,7 +3,7 @@ import ProcessData
 import tkinter as tk
 from SETTINGS import SETTINGS
 from tkinter.filedialog import askopenfilenames
-from tkinter.messagebox import askquestion
+from tkinter.messagebox import askquestion, showwarning
 
 '''
 TODO:       Er moet nog een entry veld worden gemaakt, waarin de maand aangegeven kan worden.
@@ -19,7 +19,7 @@ class GUI:
 
     def __init__(self):
         self.root = tk.Tk()
-        self.root.title('Testing area')
+        self.root.title('Telefoon Analyse')
         self.root.columnconfigure([0, 1, 2], minsize=20)
         self.root.rowconfigure([0, 1, 2, 3], minsize=20)
         self.all_files = None
@@ -46,6 +46,9 @@ class GUI:
             files_2, msgbox = self.load_file()
             for i in files_2:
                 self.all_files.append(i)
+        if len(self.all_files) != 4:
+            showwarning('Waarschuwing', 'Er zijn geen 4 bestanden geselecteerd.'
+                                        '\nAantal nu geselecteerd: {0}'.format(len(self.all_files)))
 
     def create_info_label(self):
         lbl = tk.Label(self.root, text='Fill in month:')

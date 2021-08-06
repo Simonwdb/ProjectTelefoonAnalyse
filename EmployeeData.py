@@ -1,6 +1,7 @@
 import openpyxl
 import pandas as pd
 import matplotlib.pyplot as plt
+from io import BytesIO
 
 
 def strip_name(string):
@@ -120,18 +121,26 @@ class EmployeeData:
     def create_employee_total_df(self):
         df = self.select_employee_df('Agent', 'total')
         df['Agent'] = df['Agent'].apply(lambda x: strip_name(x))
+        title = f'CallsAnswered per person in {self.month}'
 
-        ax = df.plot(x='Agent', y='CallsAnswered', kind='bar', title='CallsAnswered', rot=20, figsize=(17, 7), color='DarkOrange')
+        ax = df.plot(x='Agent', y='CallsAnswered', kind='bar', title=title, rot=20, figsize=(17, 7), color='DarkOrange')
         for p in ax.patches:
             ax.annotate(str(p.get_height()), (p.get_x() * 1.007, p.get_height() * 1.007))
 
-        plt.title(f'CallsAnswered per person in {self.month}')
-        plt.savefig(f'CallsAnswered {self.month}.png',  bbox_inches='tight', pad_inches=0.1)
-        plt.clf()
+        image_name = BytesIO()
 
-        df.to_excel(self.writer, sheet_name=f'CallsAnswered {self.month}')
+        plt.savefig(image_name,  bbox_inches='tight', pad_inches=0.1, format='png')
+        # plt.clf()
+        # testing if this will help the permission denied error in the main.exe
+        plt.close()
 
-        self.write_plot_to_excel(f'CallsAnswered {self.month}', f'CallsAnswered {self.month}.png', 'O2')
+        image_name.seek(0)
+
+        sheet_name = f'CallsAnswered {self.month}'
+
+        df.to_excel(self.writer, sheet_name=sheet_name)
+
+        self.write_plot_to_excel(sheet_name, image_name, 'O2')
 
         self.writer.save()
 
@@ -188,22 +197,28 @@ class EmployeeData:
         labels = [strip_label(l) for l in labels]
         plotdata = pd.DataFrame(data_dict, index=labels)
         plotdata = plotdata.sort_index(axis=0)
+        title = f'CallsAnswered per label in {self.month}'
 
-        plotdata.plot(kind="bar", stacked=True, figsize=(20, 8), rot=10, color=color_list)
+        plotdata.plot(kind="bar", stacked=True, figsize=(20, 8), rot=10, title=title, color=color_list)
 
         # the legend is now outside the plot -bbox_to_anchor=(1, 1)- but that makes the plot more wide.
         # currently removing the -bbox_to_anchor=(1, 1)-
         plt.legend(title='name person - #calls answered', loc='upper right', bbox_to_anchor=(1, 1))
 
-        plt.title(f'CallsAnswered per label in {self.month}')
-        plt.savefig(f'CallsAnswered per label {self.month}.png', bbox_inches='tight', pad_inches=0.1)
-        plt.clf()
+        image_name = BytesIO()
+
+        plt.savefig(image_name, bbox_inches='tight', pad_inches=0.1, format='png')
+        # plt.clf()
+        # testing if this will help the permission denied error in the main.exe
+        plt.close()
+
+        image_name.seek(0)
 
         sheet_name = f'CallsAnswered per label {self.month}'
 
         plotdata.to_excel(self.writer, sheet_name=sheet_name)
 
-        self.write_plot_to_excel(sheet_name, f'CallsAnswered per label {self.month}.png', 'T2')
+        self.write_plot_to_excel(sheet_name, image_name, 'T2')
         self.writer.save()
 
     def create_both_plots(self):

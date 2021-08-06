@@ -2,6 +2,7 @@ import os
 import openpyxl
 import pandas as pd
 import matplotlib.pyplot as plt
+from io import BytesIO
 
 
 class ConvertData:
@@ -131,10 +132,16 @@ class ConvertData:
             for p in ax.patches:
                 ax.annotate(str(int(p.get_height())), (p.get_x() * 1.007, p.get_height() * 1.007))
 
-        image_name = f'{title}.png'
+        # trying to change the image_name
+        # image_name = f'{title}.png'
+        image_name = BytesIO()
+        plt.savefig(image_name,  bbox_inches='tight', pad_inches=0.1, format='png')
 
-        plt.savefig(image_name,  bbox_inches='tight', pad_inches=0.1)
-        plt.clf()
+        # plt.clf()
+        # testing if this will help the permission denied error in the main.exe
+        plt.close()
+
+        image_name.seek(0)
 
         data_df.to_excel(self.writer, sheet_name=sheet_name)
 
@@ -158,10 +165,16 @@ class ConvertData:
         plt.title(f"Antwoordservice {self.month}")
         plt.suptitle(f'Total missed calls = {len(data_df)}', y=0.1)
 
-        image_name = f'Piechart {self.month}.png'
-        plt.savefig(image_name,  bbox_inches='tight', pad_inches=0.1)
+        # trying to change the image_name
+        # image_name = f'{title}.png'
+        image_name = BytesIO()
+        plt.savefig(image_name,  bbox_inches='tight', pad_inches=0.1, format='png')
 
-        plt.clf()
+        # plt.clf()
+        # testing if this will help the permission denied error in the main.exe
+        plt.close()
+
+        image_name.seek(0)
 
         sheet_name = f'Antwoordservice {self.month}'
 
